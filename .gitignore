@@ -1,0 +1,15 @@
+#vendor file
+vendor/
+
+#sql file
+*.sql
+
+composer.json
+composer.lock
+
+#connect
+connect.php
+
+#upload
+upload/
+images/

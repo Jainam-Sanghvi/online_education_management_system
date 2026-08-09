@@ -1,0 +1,109 @@
+<?php
+require("../connect.php");
+error_reporting(0);
+
+//use PHP Mailer & Exception
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+// Load PHPMailer
+require '../vendor/autoload.php';
+
+if(isset($_POST["submit"]))
+{
+   $email=mysqli_real_escape_string($con,$_POST["email"]);
+   
+   $select="select * from tbltutor where email='$email'";
+   $result=mysqli_query($con,$select);
+   $r=mysqli_fetch_array($result);
+  $tutorid=$r["id"];
+   if(mysqli_num_rows($result)>0)
+   {
+    $message[]="email send sucessfully please check your email";
+    sendEmail($email,$tutorid);
+     
+   }
+  
+ else
+   {
+      $message[]="email id not matched";
+   }
+}
+
+function sendEmail($to,$tutorid) {
+   $mail = new PHPMailer(true);
+
+   try {
+       // SMTP Configuration
+       $mail->isSMTP();
+       $mail->Host = 'smtp.gmail.com'; // email provider
+       $mail->SMTPAuth = true;
+       $mail->Username = 'neelpatel6340@gmail.com'; // Your email address or Host email address
+       $mail->Password = 'knko nchc emxd oxni'; // Your email password or app password  from Google App Password 
+       $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+       $mail->Port = 587;
+
+       // Sender & Recipient
+       $mail->setFrom('neelpatel6340@gmail.com', 'LMS_Demo_App');  
+       $mail->addAddress($to);
+
+       // Email Content
+       $mail->isHTML(true);
+       $mail->Subject = 'Change password';
+       $mail->Body = "
+           <div style='font-family: Arial, sans-serif; color: #333; padding: 20px;'>
+               <h3>Dear tutor</h3>
+              <p>please <a href='http://localhost:8080/gr74/admin/forgetpassword.php?id=$tutorid'>click here</a> to reset your password. This is applicable only for 30 minutes</p>
+              <p>Best Regards,<br>Your Website Team</p>
+              </div>
+       ";
+      // Send email
+       return $mail->send();
+   } catch (Exception $e) {
+       return false;
+   }
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>change password</title>
+      <!-- font awesome cdn link  -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+<!-- custom css file link  -->
+    <link rel="stylesheet" href="../css/adminmain.css">
+
+</head>
+<body style="padding-left: 0;">
+<?php
+if(isset($message)){
+   foreach($message as $message){
+      echo '
+      <div class="message form">
+         <span>'.$message.'</span>
+         <i class="fas fa-times" onclick="this.parentElement.remove();"></i>
+      </div>
+      ';
+   }
+}
+?>
+<section class="form-container">
+
+   <form action="" method="POST"  class="login">
+      <h3>Reset Password !</h3>
+      <p>your email <span>*</span></p>
+      <input type="email" name="email" placeholder="enter your email" maxlength="50" required class="box">
+      <input type="submit" name="submit" value="send email" class="btn">
+        
+    </form>
+
+</section>
+
+
+
+</body>
+</html>
